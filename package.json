@@ -1,0 +1,14 @@
+{
+  "name": "workspace",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.build.json",
+    "test": "bun test --preload ./setup.ts"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}

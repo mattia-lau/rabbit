@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@rabbit/core": ["src"],
+      "@rabbit/core/*": ["src/*"]
+    }
+  },
+  "include": ["src", "test"]
+}

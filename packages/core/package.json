@@ -1,0 +1,22 @@
+{
+  "name": "@rabbit/core",
+  "type": "module",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.build.json",
+    "test": "bun test --preload ./test/setup.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "path-to-regexp": "^7.0.0",
+    "reflect-metadata": "^0.2.2",
+    "@rabbit/common": "workspace:*"
+  }
+}
