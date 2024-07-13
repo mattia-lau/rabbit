@@ -264,11 +264,10 @@ export class RabbitEventEmitter {
     }
 
     const res = await Promise.all(promises);
-    ctx.res.body = res;
 
     await this.emitInternal(POST_INTERCEPTOR_EVENT, ctx);
     await this.emitInternal(GLOBAL_POST_INTERCEPTOR_EVENT, ctx);
 
-    return ctx.res.body;
+    return res;
   }
 }

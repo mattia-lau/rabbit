@@ -87,16 +87,12 @@ export class NodeAdapter extends Adapater {
         },
       };
 
-      let result = await application.emitAsync(event, ctx).catch((err) => {
+      const result = await application.emitAsync(event, ctx).catch((err) => {
         ctx.res.body = err.message;
         ctx.res.status = err.statusCode;
 
         return [err.message];
       });
-
-      if (result.length === 1) {
-        result = result[0];
-      }
 
       if (typeof res === "object") {
         ctx.res.headers.set("Content-Type", "application/json");

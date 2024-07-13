@@ -31,7 +31,7 @@ export class BunAdapter extends Adapater {
           },
         };
 
-        let res = await application.emitAsync(event, ctx).catch((err) => {
+        const res = await application.emitAsync(event, ctx).catch((err) => {
           return [
             new Response(err.message, {
               status: err.statusCode,
@@ -39,14 +39,11 @@ export class BunAdapter extends Adapater {
           ];
         });
 
-        if (res.length === 1) {
-          res = res[0];
-        }
-
         if (res instanceof Response) {
           return res;
         }
 
+        ctx.res.body = res;
         const headers = new Headers({
           ...ctx.res.headers,
           ...(typeof res === "object" && {

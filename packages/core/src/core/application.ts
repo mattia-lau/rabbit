@@ -1,4 +1,4 @@
-import type { Constructor, IContext } from "@rabbit/common";
+import type { ApplicationOptions, Constructor, IContext } from "@rabbit/common";
 import { resolveDI } from "..";
 import { getContainer } from "../dependency-injection/container";
 import { IsConstructor } from "../utils/is-constructor";
@@ -15,7 +15,7 @@ import { RabbitEventEmitter } from "./event-emitter";
 export class Application {
   private eventEmitter = new RabbitEventEmitter();
 
-  constructor() {}
+  constructor(private readonly options: ApplicationOptions) {}
 
   init() {
     const controllers: Constructor[] =
@@ -64,6 +64,16 @@ export class Application {
   }
 
   async emitAsync(event: string, ctx: IContext) {
-    return this.eventEmitter.emitAsync(event, ctx);
+    const res = await this.eventEmitter.emitAsync(event, ctx);
+
+    if (this.options.responseHandler) {
+      return this.options.responseHandler(event, res);
+    }
+
+    if (res.length === 1) {
+      return res[0];
+    }
+
+    return res;
   }
 }

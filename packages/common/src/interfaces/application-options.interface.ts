@@ -7,4 +7,5 @@ export interface ApplicationOptions {
   adapter: Constructor<Adapater>;
   interceptors?: Constructor<IInterceptor>[];
   hostname?: string;
+  responseHandler?: (event: string, res: any[]) => Promise<any>;
 }
