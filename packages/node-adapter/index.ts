@@ -5,7 +5,7 @@ import {
   type IContext,
 } from "@rabbit/common";
 import { createServer, IncomingMessage } from "http";
-import { Writable } from "node:stream";
+import { Readable, Writable } from "node:stream";
 import "reflect-metadata";
 
 const writeFromReadableStream = (
@@ -55,9 +55,27 @@ const writeFromReadableStream = (
   }
 };
 
-const createRequest = async (req: IncomingMessage, host: string) => {
-  // @ts-ignore
-  return new Request(host, { ...req, body: req });
+const createRequest = async (r: IncomingMessage, host: string) => {
+  const ctrl = new AbortController();
+  const headers = new Headers(r.headers as Record<string, string>);
+  const url = `http://${headers.get("host")}${r.url}`;
+
+  r.once("aborted", () => ctrl.abort());
+
+  const method = (r.method ?? "GET").toUpperCase();
+
+  const init = {
+    headers,
+    method: r.method,
+    signal: ctrl.signal,
+    duplex: "half",
+  };
+
+  if (method !== "GET" && method !== "HEAD") {
+    Object.assign(init, { body: r });
+  }
+
+  return new Request(url, init);
 };
 
 export class NodeAdapter extends Adapater {

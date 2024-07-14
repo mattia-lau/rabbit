@@ -1,5 +1,5 @@
 {
-  "name": "bun-adapter",
+  "name": "@rabbit/bun-adapter",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
