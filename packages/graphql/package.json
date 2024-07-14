@@ -1,0 +1,20 @@
+{
+  "name": "@rabbit/graphql",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@graphql-tools/merge": "^9.0.4",
+    "@graphql-tools/schema": "^10.0.4",
+    "@graphql-tools/utils": "^10.3.2",
+    "@rabbit/common": "workspace:*",
+    "@rabbit/core": "workspace:*",
+    "graphql": "^16.9.0",
+    "reflect-metadata": "^0.2.2"
+  }
+}

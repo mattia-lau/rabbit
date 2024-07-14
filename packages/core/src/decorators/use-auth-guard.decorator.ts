@@ -1,5 +1,5 @@
-import { Constructor } from "@rabbit/common";
-import { IAuthGuard } from "../types";
+import { type Constructor } from "@rabbit/common";
+import { type IAuthGuard } from "../types";
 import { USE_AUTH_GUARD_METADATA } from "../utils/symbols";
 
 export const UseAuthGuard = (
