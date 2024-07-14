@@ -1,5 +1,5 @@
-import { IContext } from "@rabbit/common";
-import { Context, IAuthGuard, Inject } from "@rabbit/core";
+import { type IContext } from "@rabbit/common";
+import { Context, type IAuthGuard, Inject } from "@rabbit/core";
 import { ConfigService } from "../services/config.service";
 
 export class AuthGuard implements IAuthGuard {

@@ -11,6 +11,7 @@ import {
   USE_AUTH_GUARD_METADATA,
 } from "../utils/symbols";
 import { RabbitEventEmitter } from "./event-emitter";
+import { pathToEvent } from "../utils/path-to-event";
 
 export class Application {
   private eventEmitter = new RabbitEventEmitter();
@@ -34,7 +35,7 @@ export class Application {
         const route = Reflect.getMetadata(PATH_METADATA, fn);
         const method = Reflect.getMetadata(METHOD_METADATA, fn);
         const guards: any[] = Reflect.getMetadata(USE_AUTH_GUARD_METADATA, fn);
-        const path = `${method}__${rootPath}${route}`;
+        const path = pathToEvent(`${rootPath}${route}`, method);
 
         if (guards) {
           const injectGuards = guards.map((guard) => {

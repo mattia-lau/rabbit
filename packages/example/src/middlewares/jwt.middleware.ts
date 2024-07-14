@@ -1,4 +1,4 @@
-import { IContext, IInterceptor } from "@rabbit/common";
+import type { IContext, IInterceptor } from "@rabbit/common";
 import { Inject } from "@rabbit/core";
 import { AuthService } from "../services/auth.service";
 
@@ -6,7 +6,7 @@ export class JwtMiddleware implements IInterceptor {
   constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   async pre(ctx: IContext) {
-    const authorization: string = ctx.req.headers.get("authorization");
+    const authorization = ctx.req.headers.get("authorization");
     if (!authorization) {
       ctx.user = null;
       return;

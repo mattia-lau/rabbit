@@ -1,4 +1,4 @@
-import { IContext, IInterceptor } from "@rabbit/common";
+import type { IContext, IInterceptor } from "@rabbit/common";
 
 export class CORSMiddleware implements IInterceptor {
   constructor() {}

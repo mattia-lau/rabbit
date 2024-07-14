@@ -9,4 +9,7 @@ createApplication({
   adapter: NodeAdapter,
   compress: true,
   interceptors: [JwtMiddleware, CORSMiddleware],
+  responseHandler: async (event, res) => {
+    return res;
+  },
 });
