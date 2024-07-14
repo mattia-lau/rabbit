@@ -1,12 +1,13 @@
+import { mergeSchemas } from "@graphql-tools/schema";
 import { resolveDI } from "@rabbit/core";
 import { IsConstructor } from "@rabbit/core/src/utils/is-constructor";
 import { IsFunction } from "@rabbit/core/src/utils/is-function";
+import { USE_AUTH_GUARD_METADATA } from "@rabbit/core/src/utils/symbols";
 import {
-  GraphQLInt,
   GraphQLObjectType,
   GraphQLSchema,
   type GraphQLFieldConfig,
-  type ThunkObjMap,
+  type ThunkObjMap
 } from "graphql";
 import {
   FIELD_METADATA,
@@ -34,9 +35,12 @@ export const buildGraphQLSchema = () => {
 
   const resolvers = Reflect.getMetadata(RESOLVER_METADATA, global) ?? [];
 
-  let rootQuery = new GraphQLObjectType({
+  const query = new GraphQLObjectType({
     name: "Query",
     fields: {},
+  });
+  let schema = new GraphQLSchema({
+    query,
   });
 
   for (const resolver of resolvers) {
@@ -51,24 +55,35 @@ export const buildGraphQLSchema = () => {
       const query = Reflect.getMetadata(QUERY_METADATA, instance[method]);
       const returnType = query();
 
-      rootQuery = new GraphQLObjectType({
-        name: "Query",
-        fields: () => ({
-          ...rootQuery["_fields"],
-          [method]: {
-            type: map[returnType],
-            resolve: (...args) => instance[method](...args),
-          },
-        }),
-      });
+      schema = mergeSchemas({
+        schemas: [
+          schema,
+          new GraphQLSchema({
+            query: new GraphQLObjectType({
+              name: "Query",
+              fields: () => ({
+                [method]: {
+                  type: map[returnType],
+                  resolve: async (parent, args, ctx, info) => {
+                    const authGaurds =
+                      Reflect.getMetadata(
+                        USE_AUTH_GUARD_METADATA,
+                        instance[method]
+                      ) ?? [];
 
-      // console.log(printSchema(schema));
+                    await ctx?.handleAuthGuard?.(authGaurds);
+
+                    // TODO: Add Parent, Info, Args to metadata
+                    return instance[method](args);
+                  },
+                },
+              }),
+            }),
+          }),
+        ],
+      });
     });
   }
-
-  const schema = new GraphQLSchema({
-    query: rootQuery,
-  });
 
   return schema;
 };

@@ -1,4 +1,9 @@
-import type { ApplicationOptions, Constructor, IContext } from "@rabbit/common";
+import type {
+  ApplicationOptions,
+  Constructor,
+  IApplication,
+  IContext,
+} from "@rabbit/common";
 import { resolveDI } from "..";
 import { getContainer } from "../dependency-injection/container";
 import { IsConstructor } from "../utils/is-constructor";
@@ -13,10 +18,12 @@ import {
 import { RabbitEventEmitter } from "./event-emitter";
 import { pathToEvent } from "../utils/path-to-event";
 
-export class Application {
+export class Application implements IApplication<any> {
   private eventEmitter = new RabbitEventEmitter();
 
-  constructor(private readonly options: ApplicationOptions) {}
+  constructor(
+    private readonly options: Pick<ApplicationOptions, "responseHandler">
+  ) {}
 
   init() {
     const controllers: Constructor[] =
@@ -34,26 +41,10 @@ export class Application {
         let fn = instance[methodName];
         const route = Reflect.getMetadata(PATH_METADATA, fn);
         const method = Reflect.getMetadata(METHOD_METADATA, fn);
-        const guards: any[] = Reflect.getMetadata(USE_AUTH_GUARD_METADATA, fn);
+        const guards: any[] =
+          Reflect.getMetadata(USE_AUTH_GUARD_METADATA, fn) ?? [];
         const path = pathToEvent(`${rootPath}${route}`, method);
-
-        if (guards) {
-          const injectGuards = guards.map((guard) => {
-            const parameterTypes: any[] =
-              Reflect.getMetadata(DEPENDENCY_INJECTION_METADATA, guard) ?? [];
-
-            const constructorValues = new Array(parameterTypes.length);
-            const container = getContainer();
-            parameterTypes.forEach((_, index) => {
-              const service = container.resolve(parameterTypes[index].symbol);
-              constructorValues[index] = service;
-            });
-
-            return new guard(...constructorValues);
-          });
-
-          this.eventEmitter.setGuards(path, injectGuards);
-        }
+        this.eventEmitter.setGuards(path, guards);
 
         // To bind this ref
         this.eventEmitter.setRef(path, instance);
@@ -76,5 +67,17 @@ export class Application {
     }
 
     return res;
+  }
+
+  async on(event: string, listener: any) {
+    return this.eventEmitter.on(event, listener);
+  }
+
+  setRef(path: string, ref: Constructor<any>) {
+    this.eventEmitter.setRef(path, ref);
+  }
+
+  async emitInternal(event: string, ctx: IContext) {
+    return this.eventEmitter.emitInternal(event, ctx);
   }
 }

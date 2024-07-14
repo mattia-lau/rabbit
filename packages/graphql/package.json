@@ -14,6 +14,7 @@
     "@graphql-tools/utils": "^10.3.2",
     "@rabbit/common": "workspace:*",
     "@rabbit/core": "workspace:*",
+    "@rabbit/node-adapter": "workspace:*",
     "graphql": "^16.9.0",
     "reflect-metadata": "^0.2.2"
   }

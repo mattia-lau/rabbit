@@ -1,6 +1,6 @@
 import type { Constructor, IContext, IInterceptor } from "@rabbit/common";
 import { match } from "path-to-regexp";
-import { resolveDI } from "..";
+import { HttpExeception, resolveDI } from "..";
 import { Context } from "../decorators/context.decorator";
 import { NotFoundError } from "../errors/not-found.error";
 import "../polyfills/promise";
@@ -12,6 +12,7 @@ import {
   HEADER_METADATA,
   INTERCEPTOR_METADATA,
   PARAMS_METADATA,
+  USE_AUTH_GUARD_METADATA,
 } from "../utils/symbols";
 
 type Listener = (...event: unknown[]) => unknown | Promise<unknown>;
@@ -25,7 +26,7 @@ const AUTH_GUARD_FAILED_EVENT = "rabbit__auth_guard_failed";
 
 export class RabbitEventEmitter {
   private events: Record<string, Listener[]> = {};
-  private guards: Record<string, IAuthGuard[]> = {};
+  private guards: Record<string, Constructor<IAuthGuard>[]> = {};
   private refs: Record<string, Constructor> = {};
 
   constructor() {
@@ -47,7 +48,7 @@ export class RabbitEventEmitter {
     this.refs[path] = ref;
   }
 
-  setGuards(key: string, val: IAuthGuard[]) {
+  setGuards(key: string, val: Constructor<IAuthGuard>[]) {
     if (!this.guards[key]) {
       this.guards[key] = [];
     }
@@ -81,7 +82,7 @@ export class RabbitEventEmitter {
     }
   }
 
-  private async emitInternal(event: string, ctx: IContext) {
+  async emitInternal(event: string, ctx: IContext) {
     const [listener] = this.events[event];
 
     return this.resolveParams(listener, event, {}, ctx);
@@ -161,11 +162,14 @@ export class RabbitEventEmitter {
   }
 
   private async handleAuthGuard(@Context() ctx: IContext) {
-    const guards = this.guards[ctx.event] ?? [];
+    const guards = [
+      ...(this.guards[ctx.event] ?? []),
+      ...(ctx._authGuards ?? []),
+    ];
 
     if (guards.length > 0) {
       const res = await Promise.all(
-        guards.map((guard) => guard.canActive(ctx))
+        guards.map((guard) => new guard(...resolveDI(guard)).canActive(ctx))
       );
 
       if (res.some((val) => val == false)) {
@@ -182,12 +186,15 @@ export class RabbitEventEmitter {
   }
 
   private async handleAuthGuardFail(@Context() ctx: IContext) {
-    return new Response(JSON.stringify({ message: "Authorized" }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      status: 403,
-    });
+    throw new HttpExeception("Unauthorized", 403);
+    // ctx.res.body = "Authorized";
+    // ctx.res.status = 403;
+    // return new Response(JSON.stringify({ message: "Authorized" }), {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   status: 403,
+    // });
   }
 
   private async handlePreGlobalInterceptor(@Context() ctx: IContext) {

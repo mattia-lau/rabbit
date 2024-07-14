@@ -6,10 +6,13 @@ import type { IInterceptor } from "../interfaces/interceptor.interface";
 export type IAdapterOptions = {
   application: IApplication<IContext>;
   interceptors: IInterceptor[];
+  makeContext?: (ctx: IContext) => Promise<any>;
 } & Omit<ApplicationOptions, "adapter" | "interceptors">;
 
-export class Adapater {
+export class Adapater<T = IAdapterOptions> {
+  kind = "HTTP";
+
   constructor() {}
 
-  createServer(options: IAdapterOptions) {}
+  createServer(options: T) {}
 }

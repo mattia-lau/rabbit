@@ -77,7 +77,7 @@ export class NodeAdapter extends Adapater {
       const request = await createRequest(req, host!);
 
       const ctx: IContext = {
-        ...rest,
+        interceptors: options.interceptors,
         req: request,
         event,
         res: {
@@ -87,11 +87,15 @@ export class NodeAdapter extends Adapater {
         },
       };
 
+      if (options.makeContext) {
+        Object.assign(ctx, await options.makeContext?.(ctx));
+      }
+
       const result = await application.emitAsync(event, ctx).catch((err) => {
         ctx.res.body = err.message;
         ctx.res.status = err.statusCode;
 
-        return [err.message];
+        return err.message;
       });
 
       if (typeof res === "object") {

@@ -4,6 +4,7 @@ import { describe, it, expect } from "bun:test";
 import { Resolver } from "../src/decorators/resolver";
 import { Query } from "../src/decorators";
 import { Field } from "../src/decorators/field";
+import { Inject, register } from "@rabbit/core";
 
 @ObjectType()
 export class Person {
@@ -14,11 +15,23 @@ export class Person {
   name!: string;
 }
 
+class PersonService {
+  get() {
+    return { age: 1 };
+  }
+}
+
+register(PersonService, (ctx) => new PersonService());
+
 @Resolver()
 export class PersonResolver {
+  constructor(
+    @Inject(PersonService) private readonly personService: PersonService
+  ) {}
+
   @Query(() => Person)
   hello() {
-    return { age: 1 };
+    return this.personService.get();
   }
 }
 

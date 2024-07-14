@@ -1,9 +1,13 @@
-import type { ApplicationOptions } from "@rabbit/common";
+import { GraphQLBaseAdapter, type ApplicationOptions } from "@rabbit/common";
 import { Application } from "./core/application";
 import { resolveDI } from "./dependency-injection";
 
 export const createApplication = (options: ApplicationOptions) => {
-  const Adapter = new options.adapter();
+  const isGraphQL = options.adapter instanceof GraphQLBaseAdapter;
+  const Adapter =
+    options.adapter instanceof GraphQLBaseAdapter
+      ? options.adapter
+      : new options.adapter();
 
   const application = new Application(options).init();
 
