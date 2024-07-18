@@ -4,7 +4,7 @@ import type { IInterceptor } from "./interceptor.interface";
 
 export type IContext<Body = any> = {
   application: IApplication<IContext>;
-  req: { body: any; params?: Record<string, unknown> } & Pick<
+  req: { body: any; params?: Record<string, unknown>; search?: string } & Pick<
     Request,
     "headers" | "signal" | "method"
   >;

@@ -1,12 +1,9 @@
 import {
   Adapter,
-  bodyParser,
   compress,
+  createContext,
   type IAdapterOptions,
-  type IContext,
 } from "@rabbit/common";
-import { RABBIT_GLOBA_INTERCEPTOR } from "@rabbit/internal";
-import "reflect-metadata";
 
 export class BunAdapter extends Adapter {
   createServer(options: IAdapterOptions): void {
@@ -15,45 +12,14 @@ export class BunAdapter extends Adapter {
     Bun.serve({
       port,
       fetch: async (request) => {
-        let { pathname } = new URL(request.url);
-        if (pathname.charAt(pathname.length - 1) !== "/") {
-          pathname = `${pathname}/`;
-        }
+        const ctx = await createContext(options, request);
 
-        const event = `${request.method.toUpperCase()}__${pathname}`;
+        const res = await application.emitAsync(ctx.event, ctx).catch((err) => {
+          ctx.res.body = err.message;
+          ctx.res.status = err.statusCode;
 
-        const ctx: IContext = {
-          ...rest,
-          application,
-          [RABBIT_GLOBA_INTERCEPTOR]: options.interceptors,
-          req: {
-            ...request,
-            body: await bodyParser(request),
-            headers: request.headers,
-          },
-          event,
-          res: {
-            body: "",
-            status: 200,
-            headers: new Headers(),
-          },
-        };
-
-        if (options.makeContext) {
-          Object.assign(ctx, await options.makeContext(ctx));
-        }
-
-        const res = await application.emitAsync(event, ctx).catch((err) => {
-          return [
-            new Response(err.message, {
-              status: err.statusCode,
-            }),
-          ];
+          return err.message;
         });
-
-        if (res instanceof Response) {
-          return res;
-        }
 
         ctx.res.body = res;
         const headers = new Headers({

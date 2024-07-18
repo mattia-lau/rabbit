@@ -1,11 +1,9 @@
 import {
   Adapter,
-  bodyParser,
   compress,
+  createContext,
   type IAdapterOptions,
-  type IContext,
 } from "@rabbit/common";
-import { RABBIT_GLOBA_INTERCEPTOR } from "@rabbit/internal";
 import { createServer, IncomingMessage } from "http";
 import { Writable } from "node:stream";
 
@@ -59,7 +57,7 @@ const writeFromReadableStream = (
 const createRequest = async (r: IncomingMessage, host: string) => {
   const ctrl = new AbortController();
   const headers = new Headers(r.headers as Record<string, string>);
-  const url = `http://${headers.get("host")}${r.url}`;
+  const url = `https://${host}${r.url}`;
 
   r.once("aborted", () => ctrl.abort());
 
@@ -84,44 +82,19 @@ export class NodeAdapter extends Adapter {
     const { application, hostname, port, ...rest } = options;
 
     createServer(async (req, res) => {
-      let pathname = req.url!;
-      if (pathname.charAt(pathname.length - 1) !== "/") {
-        pathname = `${pathname}/`;
-      }
-
-      const event = `${req.method!.toUpperCase()}__${pathname}`;
-
       const host = req.headers.host ?? hostname;
-
       const request = await createRequest(req, host!);
 
-      const ctx: IContext = {
-        application,
-        [RABBIT_GLOBA_INTERCEPTOR]: options.interceptors,
-        req: {
-          ...request,
-          body: await bodyParser(request),
-          headers: request.headers,
-          method: request.method.toUpperCase(),
-        },
-        event,
-        res: {
-          body: "",
-          status: 200,
-          headers: new Headers(),
-        },
-      };
+      const ctx = await createContext(options, request);
 
-      if (options.makeContext) {
-        Object.assign(ctx, await options.makeContext(ctx));
-      }
+      const result = await application
+        .emitAsync(ctx.event, ctx)
+        .catch((err) => {
+          ctx.res.body = err.message;
+          ctx.res.status = err.statusCode;
 
-      const result = await application.emitAsync(event, ctx).catch((err) => {
-        ctx.res.body = err.message;
-        ctx.res.status = err.statusCode;
-
-        return err.message;
-      });
+          return err.message;
+        });
 
       if (typeof res === "object") {
         ctx.res.headers.set("Content-Type", "application/json");
