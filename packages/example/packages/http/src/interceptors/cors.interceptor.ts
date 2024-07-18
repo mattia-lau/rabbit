@@ -1,6 +1,6 @@
 import type { IContext, IInterceptor } from "@rabbit/common";
 
-export class CORSMiddleware implements IInterceptor {
+export class CORSInterceptor implements IInterceptor {
   constructor() {}
 
   async pre(ctx: IContext) {

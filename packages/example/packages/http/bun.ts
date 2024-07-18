@@ -2,12 +2,12 @@ import "./src/setup";
 
 import { BunAdapter } from "@rabbit/bun-adapter";
 import { createApplication } from "@rabbit/core";
-import { CORSMiddleware } from "./src/middlewares/cors.middleware";
-import { JwtMiddleware } from "./src/middlewares/jwt.middleware";
+import { CORSInterceptor } from "./src/interceptors/cors.interceptor";
+import { JwtInterceptor } from "./src/interceptors/jwt.interceptor";
 
 createApplication({
   adapter: BunAdapter,
   compress: true,
-  interceptors: [JwtMiddleware, CORSMiddleware],
+  interceptors: [JwtInterceptor, CORSInterceptor],
   port: 3000,
 });

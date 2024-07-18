@@ -16,8 +16,8 @@ import {
 import { GraphQLString } from "graphql";
 import { User } from "../../decorators/user.decorator";
 import { AuthGuard } from "../../guards/auth.guard";
-import { JwtMiddleware } from "../../middlewares/jwt.middleware";
-import { LoggingMiddleware } from "../../middlewares/logging.middleware";
+import { JwtInterceptor } from "../../interceptors/jwt.interceptor";
+import { LoggingInterceptor } from "../../interceptors/logging.interceptor";
 import { PersonService } from "../../services/person.service";
 import { UpvotePostInput } from "../inputs/upvote-post.input";
 import { Character } from "../models/character.interface";
@@ -29,7 +29,7 @@ export class PersonResolver {
   ) {}
 
   @Query(() => Character)
-  @UseInterceptor(LoggingMiddleware, JwtMiddleware)
+  @UseInterceptor(LoggingInterceptor, JwtInterceptor)
   @UseAuthGuard(AuthGuard)
   hello(
     @Headers("host") host: string,

@@ -9,7 +9,7 @@ import {
   UseInterceptor,
 } from "@rabbit/core";
 import { AuthGuard } from "../guards/auth.guard";
-import { LoggingMiddleware } from "../middlewares/logging.middleware";
+import { LoggingInterceptor } from "../interceptors/logging.interceptor";
 import { DogService } from "../services/dog.service";
 
 @Controller("/dogs")
@@ -24,7 +24,7 @@ export class DogController {
 
   @Post("/")
   @UseAuthGuard(AuthGuard)
-  @UseInterceptor(LoggingMiddleware)
+  @UseInterceptor(LoggingInterceptor)
   dog() {
     return "";
   }

@@ -5,7 +5,7 @@ import { NodeAdapter } from "@rabbit/node-adapter";
 
 import "./src/user.resolver";
 
-export class CORSMiddleware {
+export class CORSCORSInterceptor {
   constructor() {}
 
   async pre(ctx: IContext) {
@@ -25,6 +25,6 @@ createApplication({
   responseHandler: async (event, res) => {
     return res[0];
   },
-  interceptors: [CORSMiddleware],
+  interceptors: [CORSCORSInterceptor],
   port: 3002,
 });

@@ -1,6 +1,6 @@
 import type { IContext, IInterceptor } from "@rabbit/common";
 
-export class LoggingMiddleware implements IInterceptor {
+export class LoggingInterceptor implements IInterceptor {
   start = new Date();
 
   pre(ctx: IContext): void | Promise<void> {

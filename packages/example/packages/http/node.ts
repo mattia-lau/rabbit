@@ -2,13 +2,13 @@ import "./src/setup";
 
 import { createApplication } from "@rabbit/core";
 import { NodeAdapter } from "@rabbit/node-adapter";
-import { CORSMiddleware } from "./src/middlewares/cors.middleware";
-import { JwtMiddleware } from "./src/middlewares/jwt.middleware";
+import { CORSInterceptor } from "./src/interceptors/cors.interceptor";
+import { JwtInterceptor } from "./src/interceptors/jwt.interceptor";
 
 createApplication({
   adapter: NodeAdapter,
   compress: true,
-  interceptors: [JwtMiddleware, CORSMiddleware],
+  interceptors: [JwtInterceptor, CORSInterceptor],
   responseHandler: async (event, res) => {
     return res;
   },

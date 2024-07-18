@@ -12,7 +12,7 @@ export const ResultUnion = createUnionType({
   types: () => [User, Post],
 });
 
-export class CORSMiddleware {
+export class CORSInterceptor {
   constructor() {}
 
   async pre(ctx: IContext) {
@@ -33,6 +33,6 @@ createApplication({
   responseHandler: async (event, res) => {
     return res[0];
   },
-  interceptors: [CORSMiddleware],
+  interceptors: [CORSInterceptor],
   port: 3001,
 });
