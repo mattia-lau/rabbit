@@ -81,7 +81,7 @@ const createRequest = async (r: IncomingMessage, host: string) => {
 
 export class NodeAdapter extends Adapter {
   createServer(options: IAdapterOptions): void {
-    const { application, hostname, ...rest } = options;
+    const { application, hostname, port, ...rest } = options;
 
     createServer(async (req, res) => {
       let pathname = req.url!;
@@ -136,6 +136,6 @@ export class NodeAdapter extends Adapter {
       res.statusCode = ctx.res.status;
 
       writeFromReadableStream(stream.body!, res);
-    }).listen(options.port ?? 3000);
+    }).listen(port);
   }
 }

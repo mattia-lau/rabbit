@@ -10,10 +10,10 @@ import "reflect-metadata";
 
 export class BunAdapter extends Adapter {
   createServer(options: IAdapterOptions): void {
-    const { application, ...rest } = options;
+    const { application, port, ...rest } = options;
 
     Bun.serve({
-      port: 3000,
+      port,
       fetch: async (request) => {
         let { pathname } = new URL(request.url);
         if (pathname.charAt(pathname.length - 1) !== "/") {

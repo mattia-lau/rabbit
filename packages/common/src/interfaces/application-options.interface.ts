@@ -3,7 +3,7 @@ import type { Constructor } from "./constructor.interface";
 import type { IInterceptor } from "./interceptor.interface";
 
 export interface ApplicationOptions {
-  port?: number;
+  port: number;
 
   compress?: boolean;
   adapter: Constructor<Adapter> | Adapter;

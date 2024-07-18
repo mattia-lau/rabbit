@@ -9,4 +9,5 @@ createApplication({
   adapter: BunAdapter,
   compress: true,
   interceptors: [JwtMiddleware, CORSMiddleware],
+  port: 3000,
 });

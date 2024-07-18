@@ -12,4 +12,5 @@ createApplication({
   responseHandler: async (event, res) => {
     return res;
   },
+  port: 3000,
 });
