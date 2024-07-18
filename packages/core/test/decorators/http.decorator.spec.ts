@@ -1,18 +1,18 @@
 import { Body, Context, Controller, Delete, Get } from "@rabbit/core";
-import { describe, expect, it } from "bun:test";
 import {
   BODY_METADATA,
   CONTEXT_METADATA,
   CONTROLLER_METADATA,
   METHOD_METADATA,
   PATH_METADATA,
-} from "../../src/utils/symbols";
+} from "@rabbit/internal";
+import { describe, expect, it } from "bun:test";
 
 @Controller("/")
 class TestController {
   @Get("/")
   fn(@Context() ctx: any) {}
-  
+
   @Delete("/")
   remove(@Body() body: any) {}
 }

@@ -1,4 +1,4 @@
-import { Constructor } from "@rabbit/common";
+import { type Constructor } from "@rabbit/common";
 import "reflect-metadata";
 
 class Container {

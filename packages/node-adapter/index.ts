@@ -1,12 +1,13 @@
 import {
-  Adapater,
+  Adapter,
+  bodyParser,
   compress,
   type IAdapterOptions,
   type IContext,
 } from "@rabbit/common";
+import { RABBIT_GLOBA_INTERCEPTOR } from "@rabbit/internal";
 import { createServer, IncomingMessage } from "http";
-import { Readable, Writable } from "node:stream";
-import "reflect-metadata";
+import { Writable } from "node:stream";
 
 const writeFromReadableStream = (
   stream: ReadableStream<Uint8Array>,
@@ -78,7 +79,7 @@ const createRequest = async (r: IncomingMessage, host: string) => {
   return new Request(url, init);
 };
 
-export class NodeAdapter extends Adapater {
+export class NodeAdapter extends Adapter {
   createServer(options: IAdapterOptions): void {
     const { application, hostname, ...rest } = options;
 
@@ -95,8 +96,14 @@ export class NodeAdapter extends Adapater {
       const request = await createRequest(req, host!);
 
       const ctx: IContext = {
-        interceptors: options.interceptors,
-        req: request,
+        application,
+        [RABBIT_GLOBA_INTERCEPTOR]: options.interceptors,
+        req: {
+          ...request,
+          body: await bodyParser(request),
+          headers: request.headers,
+          method: request.method.toUpperCase(),
+        },
         event,
         res: {
           body: "",
@@ -106,7 +113,7 @@ export class NodeAdapter extends Adapater {
       };
 
       if (options.makeContext) {
-        Object.assign(ctx, await options.makeContext?.(ctx));
+        Object.assign(ctx, await options.makeContext(ctx));
       }
 
       const result = await application.emitAsync(event, ctx).catch((err) => {
@@ -129,6 +136,6 @@ export class NodeAdapter extends Adapater {
       res.statusCode = ctx.res.status;
 
       writeFromReadableStream(stream.body!, res);
-    }).listen(3000);
+    }).listen(options.port ?? 3000);
   }
 }

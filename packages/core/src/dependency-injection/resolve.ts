@@ -1,4 +1,4 @@
-import { DEPENDENCY_INJECTION_METADATA } from "../utils/symbols";
+import { DEPENDENCY_INJECTION_METADATA } from "@rabbit/internal";
 import { getContainer } from "./container";
 
 export const resolveDI = (Instance: any) => {

@@ -1,15 +1,20 @@
 {
-  "name": "example",
-  "module": "index.ts",
+  "name": "@rabbit/example",
   "version": "0.0.1",
   "dependencies": {
+    "@apollo/gateway": "^2.8.3",
+    "@faker-js/faker": "^8.4.1",
     "@rabbit/bun-adapter": "workspace:*",
+    "@rabbit/common": "workspace:*",
     "@rabbit/core": "workspace:*",
+    "@rabbit/graphql": "workspace:*",
     "@rabbit/node-adapter": "workspace:*",
     "drizzle-orm": "^0.32.0",
+    "graphql": "^16.9.0",
     "jose": "^5.6.3",
     "lodash": "^4.17.21",
-    "pg": "^8.12.0"
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -24,9 +29,16 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build:node": "bun build node.ts --target node --outdir dist --watch",
-    "dev:bun": "bun --hot run bun.ts",
-    "dev:node": "nodemon dist/node.js"
+    "build:node": "bun build packages/http/node.ts --target node --outdir dist --watch",
+    "build:graph": "bun build packages/http/graphql.ts --target node --outdir dist --watch",
+    "dev:bun": "bun --hot run packages/http/bun.ts",
+    "dev:node": "nodemon dist/node.js",
+    "dev:graph": "nodemon dist/graphql.js",
+
+    "dev:apollo:user": "bun --hot run packages/user-application/main.ts",
+    "dev:apollo:post": "bun --hot run packages/post-application/main.ts",
+    "dev:apollo:gateway": "bun --hot run packages/gateway/main.ts",
+    "dev:apollo:start": "pnpm run --parallel --filter \"@rabbit/example\" /^dev:apollo/"
   },
   "type": "module"
 }

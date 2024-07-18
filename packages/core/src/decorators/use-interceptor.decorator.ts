@@ -1,5 +1,5 @@
 import type { Constructor, IInterceptor } from "@rabbit/common";
-import { INTERCEPTOR_METADATA } from "../utils/symbols";
+import { INTERCEPTOR_METADATA } from "@rabbit/internal";
 
 export const UseInterceptor = (
   ...interceptors: Constructor<IInterceptor>[]

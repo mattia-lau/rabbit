@@ -4,19 +4,17 @@ import type {
   IApplication,
   IContext,
 } from "@rabbit/common";
-import { resolveDI } from "..";
-import { getContainer } from "../dependency-injection/container";
-import { IsConstructor } from "../utils/is-constructor";
-import { IsFunction } from "../utils/is-function";
 import {
   CONTROLLER_METADATA,
-  DEPENDENCY_INJECTION_METADATA,
   METHOD_METADATA,
   PATH_METADATA,
-  USE_AUTH_GUARD_METADATA,
-} from "../utils/symbols";
-import { RabbitEventEmitter } from "./event-emitter";
+  AUTH_GUARD_METADATA,
+} from "@rabbit/internal";
+import { resolveDI } from "..";
+import { IsConstructor } from "../utils/is-constructor";
+import { IsFunction } from "../utils/is-function";
 import { pathToEvent } from "../utils/path-to-event";
+import { RabbitEventEmitter } from "./event-emitter";
 
 export class Application implements IApplication<any> {
   private eventEmitter = new RabbitEventEmitter();
@@ -42,7 +40,7 @@ export class Application implements IApplication<any> {
         const route = Reflect.getMetadata(PATH_METADATA, fn);
         const method = Reflect.getMetadata(METHOD_METADATA, fn);
         const guards: any[] =
-          Reflect.getMetadata(USE_AUTH_GUARD_METADATA, fn) ?? [];
+          Reflect.getMetadata(AUTH_GUARD_METADATA, fn) ?? [];
         const path = pathToEvent(`${rootPath}${route}`, method);
         this.eventEmitter.setGuards(path, guards);
 
@@ -79,5 +77,9 @@ export class Application implements IApplication<any> {
 
   async emitInternal(event: string, ctx: IContext) {
     return this.eventEmitter.emitInternal(event, ctx);
+  }
+
+  async lifecycle(ctx: IContext, fn: Function) {
+    return this.eventEmitter.lifecycle(ctx, fn);
   }
 }

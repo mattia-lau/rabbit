@@ -1,10 +1,10 @@
 import {
-  BODY_METADATA,
-  HEADERS_METADATA,
+  DecoratorKind,
   HEADER_METADATA,
   METHOD_METADATA,
   PATH_METADATA,
-} from "../utils/symbols";
+} from "@rabbit/internal";
+import { createParamDecorator } from ".";
 
 const createMappingDecorator =
   (method: string) =>
@@ -16,27 +16,43 @@ const createMappingDecorator =
   };
 
 export const Headers = (name: string): ParameterDecorator => {
-  return (target: any, propertyKey, index) => {
-    const headers =
-      Reflect.getMetadata(HEADERS_METADATA, target[propertyKey as string]) ??
-      [];
+  return createParamDecorator(
+    (ctx) => {
+      return ctx.req.headers.get(name);
+    },
+    {
+      kind: DecoratorKind.Headers,
+    }
+  );
+  // return (target: any, propertyKey, index) => {
+  //   const headers =
+  //     Reflect.getMetadata(HEADERS_METADATA, target[propertyKey as string]) ??
+  //     [];
 
-    Reflect.defineMetadata(
-      HEADERS_METADATA,
-      [...headers, { key: name, index }],
-      target[propertyKey as string]
-    );
-  };
+  //   Reflect.defineMetadata(
+  //     HEADERS_METADATA,
+  //     [...headers, { key: name, index }],
+  //     target[propertyKey as string]
+  //   );
+  // };
 };
 
 export const Body = (): ParameterDecorator => {
-  return (target: any, propertyKey, index) => {
-    Reflect.defineMetadata(
-      BODY_METADATA,
-      { key: propertyKey, index },
-      target[propertyKey as string]
-    );
-  };
+  return createParamDecorator(
+    (ctx) => {
+      return ctx.req.body;
+    },
+    {
+      kind: DecoratorKind.Body,
+    }
+  );
+  // return (target: any, propertyKey, index) => {
+  //   Reflect.defineMetadata(
+  //     BODY_METADATA,
+  //     { key: propertyKey, index },
+  //     target[propertyKey as string]
+  //   );
+  // };
 };
 
 export const Header = (name: string, value: string): MethodDecorator => {

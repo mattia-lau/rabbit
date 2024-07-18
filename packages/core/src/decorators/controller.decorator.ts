@@ -1,4 +1,4 @@
-import { CONTROLLER_METADATA, PATH_METADATA } from "../utils/symbols";
+import { CONTROLLER_METADATA, PATH_METADATA } from "@rabbit/internal";
 
 export const Controller = (path: string): ClassDecorator => {
   return (target) => {

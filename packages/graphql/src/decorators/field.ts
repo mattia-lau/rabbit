@@ -1,15 +1,23 @@
-import { FIELD_METADATA } from "../metadata/symbol";
+import { FIELD_METADATA } from "@rabbit/internal";
 
-type Options = () => any;
+type Options = {
+  nullable?: boolean;
+  defaultValue?: any;
+};
 
-export const Field = (option: Options): PropertyDecorator => {
+type ReturnType = () => any;
+
+export const Field = (
+  type: ReturnType,
+  options?: Options
+): PropertyDecorator => {
   return (target, key) => {
-    const fields = Reflect.getMetadata(FIELD_METADATA, target) ?? {};
+    const fields = Reflect.getMetadata(FIELD_METADATA, target.constructor) ?? {};
 
     Reflect.defineMetadata(
       FIELD_METADATA,
-      { ...fields, [key]: option() },
-      target
+      { ...fields, [key]: { type: type(), ...options } },
+      target.constructor
     );
   };
 };

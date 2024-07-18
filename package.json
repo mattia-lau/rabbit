@@ -1,11 +1,12 @@
 {
   "name": "workspace",
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/index.ts",
   "scripts": {
-    "build": "tsc -p ./tsconfig.build.json",
-    "test": "bun test --preload ./setup.ts"
+    "build": "tsc -p ./tsconfig.build.json --outdir dist"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.1.6",
+    "typescript": "^5.5.3"
+  }
 }

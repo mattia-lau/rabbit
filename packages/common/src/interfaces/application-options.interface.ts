@@ -1,11 +1,12 @@
-import type { Adapater } from "../adapter/base.adapter";
-import type { GraphQLBaseAdapter } from "../adapter/graph.adapter";
+import type { Adapter } from "../adapter/base.adapter";
 import type { Constructor } from "./constructor.interface";
 import type { IInterceptor } from "./interceptor.interface";
 
 export interface ApplicationOptions {
+  port?: number;
+
   compress?: boolean;
-  adapter: Constructor<Adapater> | GraphQLBaseAdapter;
+  adapter: Constructor<Adapter> | Adapter;
   interceptors?: Constructor<IInterceptor>[];
   hostname?: string;
   responseHandler?: (event: string, res: any[]) => Promise<any>;

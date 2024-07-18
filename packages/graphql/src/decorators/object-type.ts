@@ -1,12 +1,16 @@
-import { OBJECT_TYPE_METADATA } from "../metadata/symbol";
+import { OBJECT_TYPE_METADATA } from "@rabbit/internal";
 
-export const ObjectType = (): ClassDecorator => {
+type Options = {
+  interfaces?: () => any[];
+};
+
+export const ObjectType = (options?: Options): ClassDecorator => {
   return (target) => {
-    Reflect.defineMetadata(OBJECT_TYPE_METADATA, "", target);
+    const types = Reflect.getMetadata(OBJECT_TYPE_METADATA, global) ?? [];
 
     Reflect.defineMetadata(
       OBJECT_TYPE_METADATA,
-      [...(Reflect.getMetadata(OBJECT_TYPE_METADATA, global) ?? []), target],
+      [...types, { target, options }],
       global
     );
   };

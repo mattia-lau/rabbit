@@ -1,5 +1,5 @@
-import { Constructor } from "@rabbit/common";
-import { DEPENDENCY_INJECTION_METADATA } from "../utils/symbols";
+import { type Constructor } from "@rabbit/common";
+import { DEPENDENCY_INJECTION_METADATA } from "@rabbit/internal";
 
 export const Inject = (clazz: Constructor): ParameterDecorator => {
   return (target: any, key: any, index) => {

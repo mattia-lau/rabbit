@@ -1,17 +1,15 @@
-import { type Constructor } from "@rabbit/common";
-import { type IAuthGuard } from "../types";
-import { USE_AUTH_GUARD_METADATA } from "../utils/symbols";
+import { type Constructor, type IAuthGuard } from "@rabbit/common";
+import { AUTH_GUARD_METADATA } from "@rabbit/internal";
 
 export const UseAuthGuard = (
   ...authGaurd: Constructor<IAuthGuard>[]
 ): MethodDecorator => {
   return (target, propertyKey, descriptor) => {
     const authGuards =
-      Reflect.getMetadata(USE_AUTH_GUARD_METADATA, descriptor.value as any) ??
-      [];
+      Reflect.getMetadata(AUTH_GUARD_METADATA, descriptor.value as any) ?? [];
 
     Reflect.defineMetadata(
-      USE_AUTH_GUARD_METADATA,
+      AUTH_GUARD_METADATA,
       [...authGuards, ...authGaurd],
       descriptor.value as any
     );

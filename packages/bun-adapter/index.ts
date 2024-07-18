@@ -1,12 +1,14 @@
 import {
-  Adapater,
+  Adapter,
+  bodyParser,
   compress,
   type IAdapterOptions,
   type IContext,
 } from "@rabbit/common";
+import { RABBIT_GLOBA_INTERCEPTOR } from "@rabbit/internal";
 import "reflect-metadata";
 
-export class BunAdapter extends Adapater {
+export class BunAdapter extends Adapter {
   createServer(options: IAdapterOptions): void {
     const { application, ...rest } = options;
 
@@ -22,7 +24,13 @@ export class BunAdapter extends Adapater {
 
         const ctx: IContext = {
           ...rest,
-          req: request,
+          application,
+          [RABBIT_GLOBA_INTERCEPTOR]: options.interceptors,
+          req: {
+            ...request,
+            body: await bodyParser(request),
+            headers: request.headers,
+          },
           event,
           res: {
             body: "",
@@ -30,6 +38,10 @@ export class BunAdapter extends Adapater {
             headers: new Headers(),
           },
         };
+
+        if (options.makeContext) {
+          Object.assign(ctx, await options.makeContext(ctx));
+        }
 
         const res = await application.emitAsync(event, ctx).catch((err) => {
           return [
